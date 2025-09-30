@@ -29,7 +29,8 @@ class GuruController extends Controller
                 'nama_guru' => 'string|required',
                 'alamat' => 'string|required',
                 'tanggal_lahir' => 'date|required',
-                'jenis_kelamin' => 'in:L,P|required',
+                'jenis_kelamin' => 'in:L,P,Laki-laki,Perempuan|required',
+                'mapel' => 'string|required',
             ],
             'options' => [
                 'kelas' => Kelas::orderBy('nama_kelas')->get(['id','nama_kelas']),
@@ -47,7 +48,8 @@ class GuruController extends Controller
             'nama_guru' => ['required', 'string', 'max:255'],
             'alamat' => ['required', 'string'],
             'tanggal_lahir' => ['required', 'date'],
-            'jenis_kelamin' => ['required', 'in:L,P'],
+            'jenis_kelamin' => ['required', 'in:L,P,Laki-laki,Perempuan'],
+            'mapel' => ['required', 'string', 'max:255'],
         ]);
 
         $guru = Guru::create($validated);
@@ -89,7 +91,8 @@ class GuruController extends Controller
             'nama_guru' => ['required', 'string', 'max:255'],
             'alamat' => ['required', 'string'],
             'tanggal_lahir' => ['required', 'date'],
-            'jenis_kelamin' => ['required', 'in:L,P'],
+            'jenis_kelamin' => ['required', 'in:L,P,Laki-laki,Perempuan'],
+            'mapel' => ['required', 'string', 'max:255'],
         ]);
 
         $guru->update($validated);

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('alamat');
             $table->date('tanggal_lahir');
             $table->string('jenis_kelamin');
+            $table->string('mapel');
             $table->timestamps();
         });
     }
