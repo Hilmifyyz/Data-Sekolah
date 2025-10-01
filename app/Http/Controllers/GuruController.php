@@ -14,7 +14,7 @@ class GuruController extends Controller
     public function index()
     {
         $gurus = Guru::with('kelas')->latest()->get();
-        return response()->json(['data' => $gurus]);
+        return view('guru.index', compact('gurus'));
     }
 
     /**
@@ -22,20 +22,8 @@ class GuruController extends Controller
      */
     public function create()
     {
-        // Typically returns a view. Returning schema info and kelas options.
-        return response()->json([
-            'fields' => [
-                'kelas_id' => 'exists:kelas,id|required',
-                'nama_guru' => 'string|required',
-                'alamat' => 'string|required',
-                'tanggal_lahir' => 'date|required',
-                'jenis_kelamin' => 'in:L,P,Laki-laki,Perempuan|required',
-                'mapel' => 'string|required',
-            ],
-            'options' => [
-                'kelas' => Kelas::orderBy('nama_kelas')->get(['id','nama_kelas']),
-            ]
-        ]);
+        $kelas = Kelas::orderBy('nama_kelas')->get(['id','nama_kelas']);
+        return view('guru.create', compact('kelas'));
     }
 
     /**
@@ -51,13 +39,8 @@ class GuruController extends Controller
             'jenis_kelamin' => ['required', 'in:L,P,Laki-laki,Perempuan'],
             'mapel' => ['required', 'string', 'max:255'],
         ]);
-
-        $guru = Guru::create($validated);
-
-        return response()->json([
-            'message' => 'Guru created successfully',
-            'data' => $guru->load('kelas'),
-        ], 201);
+        Guru::create($validated);
+        return redirect()->route('guru.index')->with('success', 'Guru berhasil ditambahkan');
     }
 
     /**
@@ -65,7 +48,8 @@ class GuruController extends Controller
      */
     public function show(Guru $guru)
     {
-        return response()->json(['data' => $guru->load('kelas')]);
+        $guru->load('kelas');
+        return view('guru.show', compact('guru'));
     }
 
     /**
@@ -73,12 +57,9 @@ class GuruController extends Controller
      */
     public function edit(Guru $guru)
     {
-        return response()->json([
-            'data' => $guru->load('kelas'),
-            'options' => [
-                'kelas' => Kelas::orderBy('nama_kelas')->get(['id','nama_kelas']),
-            ]
-        ]);
+        $guru->load('kelas');
+        $kelas = Kelas::orderBy('nama_kelas')->get(['id','nama_kelas']);
+        return view('guru.edit', compact('guru','kelas'));
     }
 
     /**
@@ -94,13 +75,8 @@ class GuruController extends Controller
             'jenis_kelamin' => ['required', 'in:L,P,Laki-laki,Perempuan'],
             'mapel' => ['required', 'string', 'max:255'],
         ]);
-
         $guru->update($validated);
-
-        return response()->json([
-            'message' => 'Guru updated successfully',
-            'data' => $guru->refresh()->load('kelas'),
-        ]);
+        return redirect()->route('guru.index')->with('success', 'Guru berhasil diperbarui');
     }
 
     /**
@@ -109,6 +85,6 @@ class GuruController extends Controller
     public function destroy(Guru $guru)
     {
         $guru->delete();
-        return response()->json(['message' => 'Guru deleted successfully']);
+        return redirect()->route('guru.index')->with('success', 'Guru berhasil dihapus');
     }
 }

@@ -20,9 +20,9 @@ class DatabaseSeeder extends Seeder
     {
         // Ensure a test user exists (idempotent)
         User::updateOrCreate(
-            ['email' => 'test@example.com'],
+            ['email' => 'admin@example.com'],
             [
-                'name' => 'Test User',
+                'name' => 'admin',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),

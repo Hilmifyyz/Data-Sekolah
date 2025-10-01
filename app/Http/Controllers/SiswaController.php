@@ -14,7 +14,7 @@ class SiswaController extends Controller
     public function index()
     {
         $siswas = Siswa::with('kelas')->latest()->get();
-        return response()->json(['data' => $siswas]);
+        return view('siswa.index', compact('siswas'));
     }
 
     /**
@@ -22,19 +22,8 @@ class SiswaController extends Controller
      */
     public function create()
     {
-        // Typically returns a view. Returning schema info and kelas options.
-        return response()->json([
-            'fields' => [
-                'kelas_id' => 'exists:kelas,id|required',
-                'nama_siswa' => 'string|required',
-                'alamat' => 'string|required',
-                'tanggal_lahir' => 'date|required',
-                'jenis_kelamin' => 'in:L,P|required',
-            ],
-            'options' => [
-                'kelas' => Kelas::orderBy('nama_kelas')->get(['id','nama_kelas']),
-            ]
-        ]);
+        $kelas = Kelas::orderBy('nama_kelas')->get(['id','nama_kelas']);
+        return view('siswa.create', compact('kelas'));
     }
 
     /**
@@ -47,15 +36,10 @@ class SiswaController extends Controller
             'nama_siswa' => ['required', 'string', 'max:255'],
             'alamat' => ['required', 'string'],
             'tanggal_lahir' => ['required', 'date'],
-            'jenis_kelamin' => ['required', 'in:L,P'],
+            'jenis_kelamin' => ['required', 'in:L,P,Laki-laki,Perempuan'],
         ]);
-
-        $siswa = Siswa::create($validated);
-
-        return response()->json([
-            'message' => 'Siswa created successfully',
-            'data' => $siswa->load('kelas'),
-        ], 201);
+        Siswa::create($validated);
+        return redirect()->route('siswa.index')->with('success', 'Siswa berhasil ditambahkan');
     }
 
     /**
@@ -63,7 +47,8 @@ class SiswaController extends Controller
      */
     public function show(Siswa $siswa)
     {
-        return response()->json(['data' => $siswa->load('kelas')]);
+        $siswa->load('kelas');
+        return view('siswa.show', compact('siswa'));
     }
 
     /**
@@ -71,12 +56,9 @@ class SiswaController extends Controller
      */
     public function edit(Siswa $siswa)
     {
-        return response()->json([
-            'data' => $siswa->load('kelas'),
-            'options' => [
-                'kelas' => Kelas::orderBy('nama_kelas')->get(['id','nama_kelas']),
-            ]
-        ]);
+        $siswa->load('kelas');
+        $kelas = Kelas::orderBy('nama_kelas')->get(['id','nama_kelas']);
+        return view('siswa.edit', compact('siswa','kelas'));
     }
 
     /**
@@ -89,15 +71,10 @@ class SiswaController extends Controller
             'nama_siswa' => ['required', 'string', 'max:255'],
             'alamat' => ['required', 'string'],
             'tanggal_lahir' => ['required', 'date'],
-            'jenis_kelamin' => ['required', 'in:L,P'],
+            'jenis_kelamin' => ['required', 'in:L,P,Laki-laki,Perempuan'],
         ]);
-
         $siswa->update($validated);
-
-        return response()->json([
-            'message' => 'Siswa updated successfully',
-            'data' => $siswa->refresh()->load('kelas'),
-        ]);
+        return redirect()->route('siswa.index')->with('success', 'Siswa berhasil diperbarui');
     }
 
     /**
@@ -106,6 +83,6 @@ class SiswaController extends Controller
     public function destroy(Siswa $siswa)
     {
         $siswa->delete();
-        return response()->json(['message' => 'Siswa deleted successfully']);
+        return redirect()->route('siswa.index')->with('success', 'Siswa berhasil dihapus');
     }
 }

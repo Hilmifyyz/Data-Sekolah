@@ -9,12 +9,7 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
-        return response()->json([
-            'fields' => [
-                'email' => 'string|required|email',
-                'password' => 'string|required',
-            ],
-        ]);
+        return view('auth.login');
     }
 
     public function login(Request $request)
@@ -26,16 +21,10 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-
-            return response()->json([
-                'message' => 'Login successful',
-                'user' => Auth::user(),
-            ]);
+            return redirect()->intended(route('dashboard'))->with('success', 'Login berhasil');
         }
 
-        return response()->json([
-            'message' => 'The provided credentials do not match our records.'
-        ], 422);
+        return back()->withErrors(['email' => 'Email atau password salah'])->onlyInput('email');
     }
 
     public function logout(Request $request)
@@ -45,8 +34,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json([
-            'message' => 'Logged out successfully',
-        ]);
+        return redirect()->route('login')->with('success', 'Logout berhasil');
     }
 }
