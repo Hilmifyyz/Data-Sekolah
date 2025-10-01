@@ -19,7 +19,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
     Route::resource('siswa', SiswaController::class);
     Route::resource('guru', GuruController::class);
-    Route::resource('kelas', KelasController::class);
+    Route::resource('kelas', KelasController::class)->parameters([
+        'kelas' => 'kelas'
+    ]);
 
     // Aggregation endpoints
     Route::get('rekap/siswa-per-kelas', [KelasController::class, 'siswaPerKelas']);
